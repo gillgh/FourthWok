@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
                     // Обновляем список во всех фрагментах, использующих адаптер
                     pagerAdapter.fragments.forEach { fragment ->
                         if (fragment is NoteList) {
-                            fragment.adapter.updateList(allNotes)
+                            fragment.noteViewModel.updateNotes(allNotes)
                         }
                     }
                 }
@@ -74,4 +74,8 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, CreateNote::class.java)
         createNoteLauncher.launch(intent)
     }
+
+
+
+
 }

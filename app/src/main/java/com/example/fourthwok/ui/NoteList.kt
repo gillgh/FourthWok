@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,9 +19,10 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NoteList : Fragment(), OnDeleteClickListener, OnItemClickListener {
+class NoteList : Fragment(), OnItemClickListener {
     private lateinit var recyclerView: RecyclerView
     internal lateinit var adapter: NoteAdapter
+    internal lateinit var noteViewModel: NoteViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,7 +34,18 @@ class NoteList : Fragment(), OnDeleteClickListener, OnItemClickListener {
         adapter = NoteAdapter(emptyList())
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(activity)
+        // Подключение NoteViewModel
+        noteViewModel = ViewModelProvider(requireActivity())[NoteViewModel::class.java]
+
+        // Наблюдение за изменениями списка заметок и обновление UI
+        noteViewModel.notes.observe(viewLifecycleOwner) { notes ->
+            adapter.updateList(notes)
+        }
         return view
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        noteViewModel = ViewModelProvider(requireActivity())[NoteViewModel::class.java]
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -43,6 +56,12 @@ class NoteList : Fragment(), OnDeleteClickListener, OnItemClickListener {
 
         // Получаем объект DAO из базы данных
         val noteDao = db.noteDao()
+
+        // Наблюдение за изменениями списка заметок и обновление UI
+        noteViewModel.notes.observe(viewLifecycleOwner) { notes ->
+            adapter.updateList(notes)
+        }
+
 
         // Получаем список всех заметок из базы данных
         lifecycleScope.launch {
@@ -62,29 +81,6 @@ class NoteList : Fragment(), OnDeleteClickListener, OnItemClickListener {
         // Реализуйте логику обработки нажатия на заметку
         openNoteForEditing(note)
 
-
-    }
-
-    override fun onDeleteClick(note: Note) {
-        // Реализуйте логику обработки нажатия на заметку
-        deleteNote(note)
-    }
-    private fun deleteNote(note: Note) {
-        val db = AppDatabase.getInstance(requireContext())
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                db.noteDao().delete(note)
-            }
-            val updatedNotes = withContext(Dispatchers.IO) {
-                db.noteDao().getAll()
-            }
-            adapter.updateList(updatedNotes)
-
-            val position = adapter.notes.indexOf(note)
-            if (position != -1) {
-                adapter.deleteItem(position)
-            }
-        }
 
     }
 

@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.fourthwok.db.AppDatabase
 import com.example.fourthwok.db.Note
+import com.example.fourthwok.db.NoteDao
 import com.example.fourthwok.ui.NoteAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,6 +20,8 @@ class EditNoteActivity : AppCompatActivity() {
     private lateinit var titleEditText: EditText
     private lateinit var contentEditText: EditText
     private lateinit var adapter: NoteAdapter
+    private lateinit var noteViewModel: NoteViewModel
+    private lateinit var noteDao: NoteDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +37,9 @@ class EditNoteActivity : AppCompatActivity() {
         contentEditText = findViewById(R.id.edit_text_content)
         titleEditText.setText(note.title)
         contentEditText.setText(note.content)
+
+        val db = AppDatabase.getInstance(applicationContext)
+        noteDao = db.noteDao()
 
         // Настройте кнопку "Сохранить заметку" для сохранения отредактированной заметки
         val saveButton: Button = findViewById(R.id.button_save)
@@ -51,6 +58,8 @@ class EditNoteActivity : AppCompatActivity() {
         cancelButton.setOnClickListener {
             finish()
         }
+        // Подключение NoteViewModel
+        noteViewModel = ViewModelProvider(this)[NoteViewModel::class.java]
     }
 
     private fun saveNote() {
@@ -77,6 +86,10 @@ class EditNoteActivity : AppCompatActivity() {
                 val allNotes = withContext(Dispatchers.IO) {
                     noteDao.getAll()
                 }
+                val updatedNotes = withContext(Dispatchers.IO) {
+                    noteDao.getAll()
+                }
+                noteViewModel.updateNotes(updatedNotes)
                 adapter.updateList(allNotes)
                 adapter.notifyDataSetChanged()
                 setResult(RESULT_OK)
@@ -86,6 +99,7 @@ class EditNoteActivity : AppCompatActivity() {
                 // TODO: Добавьте необходимую обработку ошибки
             }
         }
+
     }
 
     private fun deleteNote() {
@@ -103,10 +117,12 @@ class EditNoteActivity : AppCompatActivity() {
             val updatedNotes = withContext(Dispatchers.IO) {
                 noteDao.getAll()
             }
+            noteViewModel.updateNotes(updatedNotes)
             adapter.updateList(updatedNotes)
             adapter.notifyDataSetChanged()
             setResult(RESULT_OK)
             finish()
         }
+
     }
 }
