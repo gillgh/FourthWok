@@ -21,7 +21,7 @@ import java.util.*
 
 class NoteList : Fragment(), OnItemClickListener {
     private lateinit var recyclerView: RecyclerView
-    internal lateinit var adapter: NoteAdapter
+    private lateinit var adapter: NoteAdapter
     internal lateinit var noteViewModel: NoteViewModel
 
     override fun onCreateView(
@@ -63,13 +63,7 @@ class NoteList : Fragment(), OnItemClickListener {
         }
 
 
-        // Получаем список всех заметок из базы данных
-        lifecycleScope.launch {
-            val allNotes = withContext(Dispatchers.IO) {
-                noteDao.getAll()
-            }
-            adapter.updateList(allNotes)
-        }
+        
 
         // Установка слушателя
         adapter.setOnItemClickListener(this)
