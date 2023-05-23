@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Zaметки</string>
+    <string name="button_create_note">Создать</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="note_list_fragment_label">Листы</string>
+    <string name="create_note_fragment_label">создать заметку</string>
+    <string name="note_tags_fragment_label">Теги</string>
+    <string name="tabs">Tabs</string>
+</resources>

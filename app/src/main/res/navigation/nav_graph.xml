@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/fragment_note_list">
+
+    <fragment
+        android:id="@+id/fragment_note_list"
+        android:name="com.example.fourthwok.ui.NoteList"
+        android:label="@string/note_list_fragment_label"
+        />
+
+    <fragment
+        android:id="@+id/fragment_note_tags"
+        android:name="com.example.fourthwok.ui.NoteTags"
+        android:label="@string/note_tags_fragment_label"
+        />
+
+
+    <action
+        android:id="@+id/action_noteList_to_noteTags"
+        app:destination="@id/fragment_note_tags"
+    />
+
+</navigation>
